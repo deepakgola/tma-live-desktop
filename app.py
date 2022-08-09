@@ -155,7 +155,7 @@ app.layout = html.Div(children=[
                        'fontSize': 40}
                    ),
 
-            html.P('100%',
+            html.P('',
                    style={
                        'textAlign': 'center',
                        'color': 'orange',
