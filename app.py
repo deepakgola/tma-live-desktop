@@ -102,7 +102,8 @@ fig_bar_stacked.layout.font = dict(
     family="sans-serif",
     size=12,
     color='white')
-
+fig_bar_stacked.layout.xaxis = dict(dtick=0.1, title='Stages Completion %')
+fig_bar_stacked.layout.yaxis = dict(dtick=1, title='Regional Centre\'s')
 fig_bar_stacked.layout.legend = {
     'orientation': 'h',
     'bgcolor': '#1f2c56',
