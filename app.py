@@ -2,6 +2,7 @@ import pandas as pd
 import plotly.express as px
 import plotly.graph_objs as go
 from dash import Dash, html, dcc
+from dash.dependencies import Input, Output
 import urllib.request as urllib2
 import json
 
@@ -102,8 +103,8 @@ fig_bar_stacked.layout.font = dict(
     family="sans-serif",
     size=12,
     color='white')
-fig_bar_stacked.layout.xaxis = dict(dtick=0.1, title='Stages Completion %')
-fig_bar_stacked.layout.yaxis = dict(dtick=1, title='Regional Centre\'s')
+fig_bar_stacked.layout.xaxis = dict(dtick=0.1, title='Stages Completion %'.upper())
+fig_bar_stacked.layout.yaxis = dict(dtick=1, title='Regional Centre\'s'.upper())
 fig_bar_stacked.layout.legend = {
     'orientation': 'h',
     'bgcolor': '#1f2c56',
@@ -175,14 +176,14 @@ app.layout = html.Div(children=[
             html.P(f"{unallocated:,.0f}",
                    style={
                        'textAlign': 'center',
-                       'color': '#dd1e35',
+                       'color': 'red',
                        'fontSize': 40}
                    ),
-
+            # 'color': '#dd1e35'
             html.P(f"({(unallocated / uploaded) * 100:.2f}%)",
                    style={
                        'textAlign': 'center',
-                       'color': '#dd1e35',
+                       'color': 'red',
                        'fontSize': 15,
                        'margin-top': '-18px'}
                    )], className="card_container three columns",
@@ -246,7 +247,163 @@ app.layout = html.Div(children=[
 
         ], className="create_container eight columns"),
     ], className="row flex-display"),
+    html.Div([
+        html.Div([
+
+            html.P('Select Region:', className='fix_label', style={'color': 'white'}),
+
+            dcc.Dropdown(id='regions',
+                         multi=False,
+                         clearable=True,
+                         value='100-NOIDA',
+                         placeholder='Select Regions',
+                         options=[{'label': c, 'value': c}
+                                  for c in (df['REGIONAL CENTRE'].unique())], className='dcc_compon'),
+            html.P(id='uploaded', className='fix_label', style={'color': 'white', 'text-align': 'center'}),
+            html.Div([
+                html.H6("Un-Allocated",
+                        style={
+                            'textAlign': 'center',
+                            'color': 'white'}
+                        ),
+
+                html.P(id='un-allocated',
+                       style={
+                           'textAlign': 'center',
+                           'color': '#dd1e35',
+                           'fontSize': 25}
+                       )
+            ]),
+            html.Div([
+                html.H6("Un-Evaluated",
+                        style={
+                            'textAlign': 'center',
+                            'color': 'white'}
+                        ),
+
+                html.P(id='un-evaluated',
+                       style={
+                           'textAlign': 'center',
+                           'color': 'red',
+                           'fontSize': 25}
+                       )
+            ]),
+            html.Div([
+                html.H6("Evaluated",
+                        style={
+                            'textAlign': 'center',
+                            'color': 'white'}
+                        ),
+
+                html.P(id='evaluated',
+                       style={
+                           'textAlign': 'center',
+                           'color': 'green',
+                           'fontSize': 25}
+                       )
+            ]),
+        ], className="create_container three columns", id="cross-filter-options"),
+        html.Div([
+            dcc.Graph(id='pie_chart_region',
+                      config={'displayModeBar': 'hover'}),
+        ], className="create_container four columns"),
+
+        html.Div([
+            dcc.Graph(id="bar_chart_ais")
+
+        ], className="create_container five columns"),
+    ], className="row flex-display"),
+
 ], id="mainContainer", style={"display": "flex", "flex-direction": "column"})
+
+
+@app.callback(
+    Output('uploaded', 'children'),
+    Input('regions', 'value')
+)
+def update_uploaded(value):
+    df_res = df_regions[df_regions['REGIONAL CENTRE'] == value]
+    return f"UPLOADED : {df_res.iloc[0]['TOTAL TMA UPLOADED']:,.0f}"
+
+
+@app.callback(
+    Output('un-allocated', 'children'),
+    Input('regions', 'value')
+)
+def update_unallocated(value):
+    df_res = df_regions[df_regions['REGIONAL CENTRE'] == value]
+    return f"{df_res.iloc[0]['TOTAL UN-ALLOCATED SUBJECTS']:,.0f}"
+
+
+@app.callback(
+    Output('evaluated', 'children'),
+    Input('regions', 'value')
+)
+def update_evaluated(value):
+    df_res = df_regions[df_regions['REGIONAL CENTRE'] == value]
+    return f"{df_res.iloc[0]['TOTAL EVALUATED SUBJECTS']:,.0f}"
+
+
+@app.callback(
+    Output('un-evaluated', 'children'),
+    Input('regions', 'value')
+)
+def update_unevaluated(value):
+    df_res = df_regions[df_regions['REGIONAL CENTRE'] == value]
+    return f"{df_res.iloc[0]['TOTAL ALLOCATED UN-EVALUATED SUBJECTS']:,.0f}"
+
+
+# Create pie chart (Region Wise TMA Status)
+@app.callback(Output('pie_chart_region', 'figure'),
+              [Input('regions', 'value')])
+def update_graph(value):
+    df_res_region = df_regions[df_regions['REGIONAL CENTRE'] == value]
+    region_unallocated = df_res_region.iloc[0]['TOTAL UN-ALLOCATED SUBJECTS']
+    region_unevaluated = df_res_region.iloc[0]['TOTAL ALLOCATED UN-EVALUATED SUBJECTS']
+    region_evaluated = df_res_region.iloc[0]['TOTAL EVALUATED SUBJECTS']
+    colors = ['red', '#e55467', 'green']
+
+    return {
+        'data': [go.Pie(labels=['Un-Allocated', 'Un-Evaluated', 'Evaluated'],
+                        values=[region_unallocated, region_unevaluated, region_evaluated],
+                        marker=dict(colors=colors),
+                        hoverinfo='label+value+percent',
+                        textinfo='label+percent',
+                        textfont=dict(size=13),
+                        hole=.7,
+                        rotation=45
+                        # insidetextorientation='radial',
+
+                        )],
+
+        'layout': go.Layout(
+            # width=800,
+            # height=520,
+            plot_bgcolor='#1f2c56',
+            paper_bgcolor='#1f2c56',
+            hovermode='closest',
+            title={
+                'text': 'TMA Status : ' + value,
+
+                'y': 0.93,
+                'x': 0.5,
+                'xanchor': 'center',
+                'yanchor': 'top'},
+            titlefont={
+                'color': 'white',
+                'size': 15},
+            legend={
+                'orientation': 'h',
+                'bgcolor': '#1f2c56',
+                'xanchor': 'center', 'x': 0.5, 'y': -0.07},
+            font=dict(
+                family="sans-serif",
+                size=12,
+                color='white')
+        ),
+
+    }
+
 
 if __name__ == '__main__':
     app.run_server(debug=True)
