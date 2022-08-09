@@ -2,6 +2,8 @@ import pandas as pd
 import plotly.express as px
 import plotly.graph_objs as go
 from dash import Dash, html, dcc
+import urllib.request as urllib2
+import json
 
 uploaded = 0
 unallocated = 0
@@ -9,6 +11,12 @@ unevaluated = 0
 evaluated = 0
 
 df = pd.read_csv('https://raw.githubusercontent.com/deepakgola/tma-live-desktop/master/tma_oct22_status.csv')
+
+url = 'https://api.github.com/repos/{owner}/{repo}/commits?per_page=1'.format(owner='deepakgola',
+                                                                              repo='tma-live-desktop')
+response = urllib2.urlopen(url).read()
+data = json.loads(response.decode())
+last_updated = data[0]['commit']['author']['date']
 
 # Remove columns
 col_list = list(df)
@@ -122,7 +130,7 @@ app.layout = html.Div(children=[
         ], className="one-half column", id="title"),
 
         html.Div([
-            html.H6('Last Updated: ' + str(pd.to_datetime('today').date()), style={'color': 'orange'}),
+            html.H6('Last Updated: ' + str(last_updated), style={'color': 'orange'}),
 
         ], className="one-third column", id='title1'),
 
