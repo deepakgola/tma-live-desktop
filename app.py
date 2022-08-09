@@ -107,6 +107,7 @@ fig_bar_stacked.layout.legend = {
 
 # app = Dash(__name__)
 app = Dash(__name__, meta_tags=[{"name": "viewport", "content": "width=device-width"}])
+server = app.server
 
 app.layout = html.Div(children=[
     html.Div([
