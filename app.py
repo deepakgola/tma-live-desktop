@@ -89,8 +89,9 @@ df_bar_stacked['ALLOCATED UN-EVALUATED %'] = df_bar_stacked['TOTAL ALLOCATED UN-
 # df1 = px.data.iris()
 
 fig_bar_stacked = px.bar(df_bar_stacked,
-                         x="REGIONAL CENTRE",
-                         y=['UN-ALLOCATED %', 'ALLOCATED UN-EVALUATED %', 'EVALUATED %'],
+                         y="REGIONAL CENTRE",
+                         x=['UN-ALLOCATED %', 'ALLOCATED UN-EVALUATED %', 'EVALUATED %'],
+                         orientation='h',
                          barmode='stack'
                          )
 fig_bar_stacked.layout.plot_bgcolor = '#1f2c56'
