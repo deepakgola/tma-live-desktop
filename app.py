@@ -1,6 +1,3 @@
-# Run this app with `python app.py` and
-# visit http://127.0.0.1:8050/ in your web browser.
-
 import pandas as pd
 import plotly.express as px
 import plotly.graph_objs as go
@@ -11,10 +8,10 @@ unallocated = 0
 unevaluated = 0
 evaluated = 0
 
-df = pd.read_csv('tma_oct22_status.csv')
+df = pd.read_csv('https://raw.githubusercontent.com/deepakgola/tma-live-desktop/master/tma_oct22_status.csv')
+
 # Remove columns
 col_list = list(df)
-
 col_list.remove('SRNO')
 col_list.remove('REGIONAL CENTRE')
 col_list.remove('AI-CODE AND NAME')
