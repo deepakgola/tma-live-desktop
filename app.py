@@ -110,9 +110,16 @@ fig_bar_stacked.layout.legend = {
     'bgcolor': '#1f2c56',
     'xanchor': 'center', 'x': 0.5, 'y': 1.3}
 
+# Data : AI Wise Pendency
+df_ais = df[['REGIONAL CENTRE', 'AI-CODE AND NAME', 'TOTAL EVALUATED SUBJECTS', 'TOTAL UN-ALLOCATED SUBJECTS',
+             'TOTAL ALLOCATED UN-EVALUATED SUBJECTS']]
+df_ais['PENDING EVALUATION'] = df_ais['TOTAL UN-ALLOCATED SUBJECTS'] + df_ais['TOTAL ALLOCATED UN-EVALUATED SUBJECTS']
+df_ais = df_ais.sort_values(by=['PENDING EVALUATION'], ascending=False)
+
 # app = Dash(__name__)
 app = Dash(__name__, meta_tags=[{"name": "viewport", "content": "width=device-width"}])
 server = app.server
+app.title = "TMA Dashboard"
 
 app.layout = html.Div(children=[
     html.Div([
@@ -307,11 +314,7 @@ app.layout = html.Div(children=[
             dcc.Graph(id='pie_chart_region',
                       config={'displayModeBar': 'hover'}),
         ], className="create_container four columns"),
-
-        html.Div([
-            dcc.Graph(id="bar_chart_ais")
-
-        ], className="create_container five columns"),
+        html.Div([dcc.Graph(id="bar_chart_ais")], className="create_container five columns"),
     ], className="row flex-display"),
 
 ], id="mainContainer", style={"display": "flex", "flex-direction": "column"})
@@ -401,6 +404,73 @@ def update_graph(value):
                 size=12,
                 color='white')
         ),
+
+    }
+
+
+# Create bar chart (AI Wise pendency)
+@app.callback(Output('bar_chart_ais', 'figure'),
+              [Input('regions', 'value')])
+def update_graph(value):
+    df_ais_filtered = df_ais[df_ais['REGIONAL CENTRE'] == value].head(10)
+    return {
+        'data': [go.Bar(x=df_ais_filtered['AI-CODE AND NAME'],
+                        y=df_ais_filtered['PENDING EVALUATION'],
+                        marker=dict(color='orange'),
+                        # hoverinfo='text',
+                        # hovertext='<b>TMAs Pending For Evaluation </b>: %{x}'
+                        )],
+        'layout': go.Layout(
+            plot_bgcolor='#1f2c56',
+            paper_bgcolor='#1f2c56',
+            title={
+                'text': 'Top 10 Worst performing AIs : ' + value,
+                'y': 0.93,
+                'x': 0.5,
+                'xanchor': 'center',
+                'yanchor': 'top'},
+            titlefont={
+                'color': 'white',
+                'size': 15},
+            hovermode='x',
+            margin=dict(r=0),
+            xaxis=dict(title='<b>STUDY CENTER\'S</b>',
+                       color='white',
+                       showline=True,
+                       showgrid=True,
+                       showticklabels=True,
+                       linecolor='white',
+                       linewidth=2,
+                       ticks='outside',
+                       tickfont=dict(
+                           family='Arial',
+                           size=12,
+                           color='white'
+                       )),
+
+            yaxis=dict(title='<b>TMAs PENDING FOR EVALUATION</b>',
+                       color='white',
+                       showline=True,
+                       showgrid=True,
+                       showticklabels=True,
+                       linecolor='white',
+                       linewidth=2,
+                       ticks='outside',
+                       tickfont=dict(
+                           family='Arial',
+                           size=12,
+                           color='white'
+                       )),
+            legend={
+                'orientation': 'h',
+                'bgcolor': '#1f2c56',
+                'xanchor': 'center', 'x': 0.5, 'y': -0.3},
+            font=dict(
+                family="sans-serif",
+                size=12,
+                color='white'),
+
+        )
 
     }
 
