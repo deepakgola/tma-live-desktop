@@ -35,12 +35,14 @@ sum_df = sum_df.sort_values(by=['subjects'], ascending=False)
 
 uploaded = sum_df.iloc[0]['subjects']
 unallocated = sum_df.iloc[2]['subjects']
-unevaluated = sum_df.iloc[3]['subjects']
-evaluated = sum_df.iloc[4]['subjects']
+evaluated = sum_df.iloc[3]['subjects']
+unevaluated = sum_df.iloc[4]['subjects']
 
 overall_pie_df = sum_df.drop([0, 1], axis=0)
 
-fig1 = px.pie(overall_pie_df, values='subjects', names='stage')
+fig1 = px.pie(overall_pie_df, values='subjects', names='stage', color='stage',
+              color_discrete_map={'TOTAL ALLOCATED UN-EVALUATED SUBJECTS': '#e55467',
+                                  'TOTAL EVALUATED SUBJECTS': 'forestgreen', 'TOTAL UN-ALLOCATED SUBJECTS': 'red'})
 fig1.layout = go.Layout(
     # width=800,
     # height=520,
@@ -62,7 +64,7 @@ fig1.layout = go.Layout(
         'xanchor': 'center', 'x': 0.5, 'y': -0.07},
     font=dict(
         family="sans-serif",
-        size=12,
+        size=15,
         color='white')
 )
 
@@ -127,7 +129,8 @@ app.layout = html.Div(children=[
         html.Div([
             html.Div([
                 html.H1("TMA Dashboard", style={"margin-bottom": "0px", 'color': 'white'}),
-                html.H6("TMA Evaluation Progress Tracker", style={"margin-top": "0px", 'color': 'white'}),
+                html.H6("Progress Tracker : TMA Evaluation October-2022",
+                        style={"margin-top": "0px", 'color': 'white'}),
             ])
         ], className="one-half column", id="title"),
 
