@@ -88,14 +88,16 @@ df_bar_stacked['EVALUATED %'] = df_bar_stacked['TOTAL EVALUATED SUBJECTS'] / (
 df_bar_stacked['ALLOCATED UN-EVALUATED %'] = df_bar_stacked['TOTAL ALLOCATED UN-EVALUATED SUBJECTS'] / (
         df_bar_stacked['TOTAL UN-ALLOCATED SUBJECTS'] + df_bar_stacked['TOTAL EVALUATED SUBJECTS'] + df_bar_stacked[
     'TOTAL ALLOCATED UN-EVALUATED SUBJECTS'])
-
-# df1 = px.data.iris()
+df_bar_stacked = df_bar_stacked.sort_values(by=['EVALUATED %', 'UN-ALLOCATED %', 'ALLOCATED UN-EVALUATED %'],
+                                            ascending=True)
 
 fig_bar_stacked = px.bar(df_bar_stacked,
                          y="REGIONAL CENTRE",
-                         x=['UN-ALLOCATED %', 'ALLOCATED UN-EVALUATED %', 'EVALUATED %'],
+                         x=['EVALUATED %', 'UN-ALLOCATED %', 'ALLOCATED UN-EVALUATED %'],
                          orientation='h',
-                         barmode='stack'
+                         barmode='stack',
+                         color_discrete_map={'ALLOCATED UN-EVALUATED %': '#e55467',
+                                             'EVALUATED %': 'forestgreen', 'UN-ALLOCATED %': 'red'}
                          )
 fig_bar_stacked.layout.plot_bgcolor = '#1f2c56'
 fig_bar_stacked.layout.paper_bgcolor = '#1f2c56'
