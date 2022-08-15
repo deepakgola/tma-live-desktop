@@ -34,12 +34,19 @@ sum_df = sum_df.head(7).reset_index(name='subjects')
 sum_df.rename(columns={'index': 'stage'}, inplace=True)
 sum_df = sum_df.sort_values(by=['subjects'], ascending=False)
 
-uploaded = sum_df.iloc[0]['subjects']
+dictionary = sum_df.set_index('stage').to_dict()
+uploaded = dictionary['subjects']['TOTAL TMA UPLOADED']
+unallocated = dictionary['subjects']['TOTAL UN-ALLOCATED SUBJECTS']
+evaluated = dictionary['subjects']['TOTAL EVALUATED SUBJECTS']
+unevaluated = dictionary['subjects']['TOTAL ALLOCATED UN-EVALUATED SUBJECTS']
+
+'''uploaded = sum_df.iloc[0]['subjects']
 unallocated = sum_df.iloc[2]['subjects']
 evaluated = sum_df.iloc[3]['subjects']
-unevaluated = sum_df.iloc[4]['subjects']
+unevaluated = sum_df.iloc[4]['subjects']'''
 
-overall_pie_df = sum_df.drop([0, 1], axis=0)
+overall_pie_df = sum_df.drop(sum_df[sum_df['stage'] == 'TOTAL TMA UPLOADED'].index)
+overall_pie_df = overall_pie_df.drop(overall_pie_df[overall_pie_df['stage'] == 'TOTAL ALLOCATED SUBJECTS'].index)
 
 fig1 = px.pie(overall_pie_df, values='subjects', names='stage', color='stage',
               color_discrete_map={'TOTAL ALLOCATED UN-EVALUATED SUBJECTS': '#e55467',
@@ -88,6 +95,7 @@ df_bar_stacked['EVALUATED %'] = df_bar_stacked['TOTAL EVALUATED SUBJECTS'] / (
 df_bar_stacked['ALLOCATED UN-EVALUATED %'] = df_bar_stacked['TOTAL ALLOCATED UN-EVALUATED SUBJECTS'] / (
         df_bar_stacked['TOTAL UN-ALLOCATED SUBJECTS'] + df_bar_stacked['TOTAL EVALUATED SUBJECTS'] + df_bar_stacked[
     'TOTAL ALLOCATED UN-EVALUATED SUBJECTS'])
+
 df_bar_stacked = df_bar_stacked.sort_values(by=['EVALUATED %', 'UN-ALLOCATED %', 'ALLOCATED UN-EVALUATED %'],
                                             ascending=True)
 
