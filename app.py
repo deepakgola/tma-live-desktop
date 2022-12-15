@@ -1,10 +1,11 @@
+import json
+import urllib.request as urllib2
+
 import pandas as pd
 import plotly.express as px
 import plotly.graph_objs as go
 from dash import Dash, html, dcc
 from dash.dependencies import Input, Output
-import urllib.request as urllib2
-import json
 
 uploaded = 0
 unallocated = 0
