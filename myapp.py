@@ -149,7 +149,7 @@ app.layout = html.Div(children=[
         html.Div([
             html.Div([
                 html.H1("TMA Dashboard", style={"margin-bottom": "0px", 'color': 'white'}),
-                html.H6("Progress Tracker : TMA Evaluation October-2022",
+                html.H6("TMA Evaluation Status - Stream-1 Block-2, 2021-22 [ Exam : October-2022 ]",
                         style={"margin-top": "0px", 'color': 'white'}),
             ])
         ], className="one-half column", id="title"),
